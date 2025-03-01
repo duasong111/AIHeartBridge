@@ -27,9 +27,6 @@ SECRET_KEY = 'django-insecure-eri0g44kh3@jk9pu7&xacxmn#cth3x42+a4e8v@^eaq9j-_42j
 DEBUG = True
 
 ALLOWED_HOSTS = []
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 
 # Application definition
@@ -43,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'info',
+    'rest_framework',
     'chatmessage',
 ]
 
@@ -126,7 +124,8 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
+STATICFILES_DIRS=[os.path.join(BASE_DIR,"static")]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

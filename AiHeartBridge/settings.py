@@ -137,3 +137,10 @@ SIMPLEUI_ANALYSIS = False
 
 SIMPLEUI_HOME_TITLE = 'AI心桥后台管理'
 SIMPLEUI_DEFAULT_THEME = 'light.css'
+REST_FRAMEWORK = {
+    "UNAUTHENTICATED_USER": None,
+    # "VERSION_PARAM": "version",
+    # "DEFAULT_VERSION": "v1",
+    # "ALLOWED_VERSIONS": ["v1", "v2"],
+    # "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning"
+}

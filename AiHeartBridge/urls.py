@@ -21,5 +21,6 @@ from info import viewInfo
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('info/login/', viewInfo.LoginView.as_view(), name="login"),
+    path('info/register/', viewInfo.registerView.as_view(), name="register"),
+    path('info/login/', viewInfo.loginView.as_view(), name="login"),
 ]

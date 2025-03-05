@@ -14,7 +14,7 @@ class RegisterSerializers(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     class Meta:
         model = models.userInfo
-        fields = ["Account", "PassWord", "confirm_password"]
+        fields = ["Name","Account", "PassWord", "confirm_password"]
         extra_kwargs = {
             "id": {"read_only": True},
             "PassWord": {"write_only": True}
@@ -27,6 +27,8 @@ class RegisterSerializers(serializers.ModelSerializer):
         # 可选：检查账户是否已存在
         if models.userInfo.objects.filter(Account=attrs["Account"]).exists():
             raise exceptions.ValidationError({"Account": "该账户已存在"})
+        if models.userInfo.objects.filter(Name=attrs["Name"]).exists():
+            raise exceptions.ValidationError({"Name": "用户名已存在"})
         return attrs
 
     def create(self, validated_data):
@@ -45,7 +47,9 @@ class RegisterView(APIView):
             return Response({
                 "code": 200,
                 "message": "注册成功",
-                "data": {"Account": user.Account}  # 只返回必要数据
+                "data": {
+                    "Name":user.Name,
+                    "Account": user.Account}  # 只返回必要数据
             }, status=status.HTTP_201_CREATED)
         print("Errors:", ser.errors)  # 调试错误
         return Response({
@@ -57,7 +61,7 @@ class RegisterView(APIView):
 class LoginSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.userInfo
-        fields = ["Name", "Account", "PassWord"]        #则要求必须输入的检验数据
+        fields = ["Account", "PassWord"]        #则要求必须输入的检验数据
 
 
 class LoginView(APIView):

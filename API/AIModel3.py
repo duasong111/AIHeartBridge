@@ -29,6 +29,9 @@ def chat_with_deepseek():
         # 输出响应
         print("助手:", response.choices[0].message.content)
 
+# 尝试去建立本地大模型语言库，但是失败了，无奈后续转战调用接口吧
 
 if __name__ == "__main__":
     chat_with_deepseek()
+
+

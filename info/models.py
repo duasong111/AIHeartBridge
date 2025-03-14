@@ -31,3 +31,39 @@ class userInfo(models.Model):
         authenticated in templates.
         """
         return True
+
+
+# 新闻类型进行添加
+class Language(models.Model):
+    Name = models.CharField(verbose_name="新闻类型", max_length=32)
+    def __str__(self):
+        return self.Name
+    class Meta:
+        db_table = "news_type"
+        verbose_name = '新闻类型'
+        verbose_name_plural = '新闻类型'
+class Project(models.Model):
+    NEWS_CHOICES = (
+        (1, "心理科普"),
+        (2, "婚恋情感"),
+        (3, "家庭关系"),
+        (4, "人际社交"),
+        (5, "自我觉察"),
+        (6, "成长学习"),
+        (7, "心理健康"),
+        (8, "职场技能"),
+    )
+
+    Name = models.CharField(verbose_name="新闻标题", max_length=100)
+    Edit = models.CharField(verbose_name="新闻编辑",max_length=30,default="张三")
+    Time = models.DateField(verbose_name="时间")
+    Description = models.TextField(verbose_name="描述")
+    Memo = models.TextField(verbose_name="备注信息",default="暂无")
+    News = models.IntegerField(verbose_name='专业选择',choices=NEWS_CHOICES,default=1)
+
+    def __str__(self):
+        return self.Name
+    class Meta:
+        db_table = "news_project"
+        verbose_name = '新闻报道'
+        verbose_name_plural = '新闻报道'

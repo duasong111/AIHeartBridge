@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
+from .models import Language, Project
 from rest_framework import status
 from rest_framework import exceptions
 
@@ -35,8 +36,6 @@ class RegisterSerializers(serializers.ModelSerializer):
         # 移除 confirm_password 并创建用户
         validated_data.pop("confirm_password")
         return models.userInfo.objects.create(**validated_data)
-
-
 # 用户注册功能
 class RegisterView(APIView):
     def post(self, request):
@@ -57,13 +56,10 @@ class RegisterView(APIView):
             "message": "注册失败",
             "data": ser.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-
 class LoginSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.userInfo
         fields = ["Account", "PassWord"]        #则要求必须输入的检验数据
-
-
 class LoginView(APIView):
     def post(self, request):
 
@@ -79,3 +75,68 @@ class LoginView(APIView):
         instance.Token = token
         instance.save()
         return Response({"code": 200, "message": "登录成功", "token": token})
+
+
+class NewsInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = '__all__'
+
+class NewsInformationView(APIView):
+    authentication_classes = []
+
+    # 这个是将所有的领域的信息来进行返回
+    def get(self, request, *args, **kwargs):
+        data = models.Language.objects.all()
+        serializer = NewsInformationSerializer(data, many=True)
+
+        return Response({"code": 200, "message": "获取新闻列表成功", "data": serializer.data})
+
+
+class NewsDetailSerializer(serializers.ModelSerializer):
+    LANGUAGE_CHOICES = {
+        (1, "心理科普"),
+        (2, "婚恋情感"),
+        (3, "家庭关系"),
+        (4, "人际社交"),
+        (5, "自我觉察"),
+        (6, "成长学习"),
+        (7, "心理健康"),
+        (8, "职场技能"),
+    }
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        navLeftItems = [
+            {"id": lang_id, "data": {"title": lang_title}} for lang_id, lang_title in self.LANGUAGE_CHOICES.items()
+        ]
+
+        project_data_list = list(Project.objects.all().values())
+        navRightItems = self.group_data_by_language(project_data_list)
+
+        result = {
+            "navLeftItems": navLeftItems,
+            "navRightItems": navRightItems
+        }
+
+        return result  # 返回包含 navLeftItems 和 navRightItems 的单个对象
+
+    def group_data_by_language(self, data_list):
+        grouped_data = {}
+        for data in data_list:
+            language = data['language']
+            if language in grouped_data:
+                grouped_data[language].append(data)
+            else:
+                grouped_data[language] = [data]
+        return list(grouped_data.values())
+class NewsDetailView(APIView):
+    authentication_classes = []
+
+    # 某个领域内的获奖的状况来进行展示
+    def get(self, request, *args, **kwargs):
+        data = Project.objects.all()
+        serializer = NewsDetailSerializer(data, many=True)
+        return Response({"code": 200, "message": "获取数据成功", "data": serializer.data[0]})

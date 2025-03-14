@@ -24,11 +24,69 @@ class AiWithUserChatingInformation(models.Model):
         db_table = "ChattingWithAI"
         verbose_name = 'AI聊天'
         verbose_name_plural = 'AI聊天存储'
-
     @property
     def is_authenticated(self):
-        """
-        Always return True. This is a way to tell if the user has been
-        authenticated in templates.
-        """
         return True
+class traditionalAnsweringMode(models.Model):
+    content = models.CharField(
+        max_length=200,
+        verbose_name="题目内容"
+    )
+    index = models.IntegerField(
+        verbose_name="题目序号",
+        default=0
+    )
+    score = models.IntegerField(
+        verbose_name="分数",
+        default=0,
+    )
+    created_at = models.DateTimeField(
+        verbose_name="创建时间",
+        default=timezone.now
+    )
+
+    class Meta:
+        verbose_name = "传统答题模式"
+        verbose_name_plural = "传统答题模式"
+        ordering = ['index']  # 默认按序号排序
+
+    def __str__(self):
+        return f"{self.content[:20]} (index: {self.index})"
+
+class QuestionHistory(models.Model):
+    user = models.ForeignKey(
+        'info.userInfo',
+        on_delete=models.CASCADE,
+        verbose_name="用户",
+        related_name="question_histories"
+    )
+    question = models.CharField(
+        max_length=200,
+        verbose_name="题目"
+    )
+    choices = models.CharField(
+        max_length=200,
+        verbose_name="选项"
+    )
+    score = models.IntegerField(
+        verbose_name="分数",
+        default=0
+    )
+    experience = models.TextField(
+        max_length=500,
+        verbose_name="心得体会",
+        blank=True,  # 允许为空
+        null=True
+    )
+    created_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="创建时间"
+    )
+
+    class Meta:
+        verbose_name = "问题历史记录"
+        verbose_name_plural = "问题历史记录"
+        ordering = ['-created_at']  # 默认按创建时间倒序
+
+    def __str__(self):
+        return f"{self.user} - {self.question[:20]}"

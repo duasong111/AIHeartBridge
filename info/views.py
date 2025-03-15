@@ -87,6 +87,7 @@ class NewsInformationView(APIView):
 
     # 这个是将所有的领域的信息来进行返回
     def get(self, request, *args, **kwargs):
+
         data = models.Language.objects.all()
         serializer = NewsInformationSerializer(data, many=True)
 
@@ -95,14 +96,14 @@ class NewsInformationView(APIView):
 
 class NewsDetailSerializer(serializers.ModelSerializer):
     LANGUAGE_CHOICES = {
-        (1, "心理科普"),
-        (2, "婚恋情感"),
-        (3, "家庭关系"),
-        (4, "人际社交"),
-        (5, "自我觉察"),
-        (6, "成长学习"),
-        (7, "心理健康"),
-        (8, "职场技能"),
+        1:"心理科普",
+        2:"婚恋情感",
+        3:"家庭关系",
+        4:"人际社交",
+        5:"自我觉察",
+        6:"成长学习",
+        7:"心理健康",
+        8:"职场技能",
     }
     class Meta:
         model = Project
@@ -113,6 +114,8 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             {"id": lang_id, "data": {"title": lang_title}} for lang_id, lang_title in self.LANGUAGE_CHOICES.items()
         ]
 
+
+
         project_data_list = list(Project.objects.all().values())
         navRightItems = self.group_data_by_language(project_data_list)
 
@@ -120,17 +123,18 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             "navLeftItems": navLeftItems,
             "navRightItems": navRightItems
         }
+        print(result)
 
         return result  # 返回包含 navLeftItems 和 navRightItems 的单个对象
 
     def group_data_by_language(self, data_list):
         grouped_data = {}
         for data in data_list:
-            language = data['language']
-            if language in grouped_data:
-                grouped_data[language].append(data)
+            News = data['News']
+            if News in grouped_data:
+                grouped_data[News].append(data)
             else:
-                grouped_data[language] = [data]
+                grouped_data[News] = [data]
         return list(grouped_data.values())
 class NewsDetailView(APIView):
     authentication_classes = []

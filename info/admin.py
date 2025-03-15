@@ -19,6 +19,6 @@ class Language(admin.ModelAdmin):
 class AboutAdmin(admin.ModelAdmin):
     fieldsets = (
         ("人物", {'fields': ['Name',  'Edit']}),
-        ("其他", {'fields': ['Memo','News','Time']}),
+        ("其他", {'fields': ['News','Time','Description','Memo']}),
     )
-    list_display = ('id','Name','Edit','News' ,'Memo', 'Time',)
+    list_display = ('id','Name','Edit','News' ,'Description','Memo', 'Time',)

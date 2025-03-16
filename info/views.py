@@ -113,18 +113,12 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         navLeftItems = [
             {"id": lang_id, "data": {"title": lang_title}} for lang_id, lang_title in self.LANGUAGE_CHOICES.items()
         ]
-
-
-
         project_data_list = list(Project.objects.all().values())
         navRightItems = self.group_data_by_language(project_data_list)
-
         result = {
             "navLeftItems": navLeftItems,
             "navRightItems": navRightItems
         }
-        print(result)
-
         return result  # 返回包含 navLeftItems 和 navRightItems 的单个对象
 
     def group_data_by_language(self, data_list):

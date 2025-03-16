@@ -20,7 +20,11 @@ from django.urls import path,include
 urlpatterns = [
     # 进入后台管理
     path('admin/', admin.site.urls),
-    #用户信息
+    #用户信息有关接口
     path('info/', include(('info.urls', 'info'), namespace='info')),
+    # 有关大模型聊天的区域
+    path('chatmessage/', include(('chatmessage.urls', 'chatMessage'), namespace='chatMessage')),
+    # 新闻，信息，通告展示接口
+    path('newentrance/', include(('articleanno.urls', 'newEntrance'), namespace='newEntrance')),
 
 ]

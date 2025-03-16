@@ -41,8 +41,8 @@ class Notices(models.Model):
 
     class Meta:
         db_table = "everyday_notices"
-        verbose_name = '信息通知'
-        verbose_name_plural = '信息通告'
+        verbose_name = '通告展示'
+        verbose_name_plural = '全体通告展示'
 
 """关于心理健康有关的新闻"""
 class News(models.Model):

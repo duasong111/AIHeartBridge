@@ -5,7 +5,9 @@ from django.utils.encoding import smart_str
 
 """获取AI与人之间聊天的内容并进行存储"""
 class AiWithUserChatingInformation(models.Model):
-
+    UserId = models.CharField(max_length=100, default="default_user")
+    Role = models.CharField(max_length=10, choices=[("user", "User"), ("assistant", "Assistant")])
+    Content = models.TextField()
     TopicName = models.CharField(verbose_name="话题名称",max_length=40)
     TopicStartTime = models.TimeField(verbose_name="话题开始时间",default=timezone.now)
     TopicEndTime = models.TimeField(verbose_name="话题结束时间", default=timezone.now)

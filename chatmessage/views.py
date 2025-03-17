@@ -1,15 +1,21 @@
+import json
 from datetime import datetime
 
+from django.http import JsonResponse
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from API.AIMod2 import get_spark_response ,trim_history # 导入封装好的函数
-from .models import AiWithUserChatingInformation
+from API.AIMod2 import get_spark_response, trim_history  # 导入封装好的函数
+from .models import AiWithUserChatingInformation,summaryAnswerStorage
+from API.DeepSeek import analyze_messages_with_deepseek
+
 
 class AIWithUserChatView(APIView):
     authentication_classes = []  # 无需认证
     '''此处是进行与AI大模型进行沟通对话的内容，已经进行了上下文效果不是很理想，期待后续开发中进行进一步的完善'''
+
     def post(self, request, *args, **kwargs):
         input_text = request.data.get('input_text', None)
         user_id = request.data.get('user_id', 'default_user')
@@ -88,6 +94,46 @@ class AIWithUserChatView(APIView):
 
 class AIDealChatMessageView(APIView):
     authentication_classes = []  # 无需认证
-    '''此处是进行10条输出传输过来，然后使用大模型进行分析'''
-    def get(self, request, *args, **kwargs):
-        return "还没有写"
+    '''该接口是能够将用户与星火大模型之间的聊天之间进行一个汇总，并将汇总内容以列表的形式去传输给DeepSeek
+    再由deepseek去进行一个汇总，并将汇总数据进行存储'''
+    def post(self, request, *args, **kwargs):
+        try:
+            # 解码字节数据为 UTF-8 字符串
+            data = json.loads(request.body.decode('utf-8'))
+            if "messageList" not in data or not isinstance(data["messageList"], list):
+                return Response(
+                    {"error": "Request must contain a 'messageList' key with a list of messages"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            messages = data["messageList"][:10]
+            for msg in messages:
+                if not all(key in msg for key in ["content", "sender", "timestamp"]):
+                    return Response(
+                        {"error": "Each message must have 'content', 'sender', and 'timestamp'"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            analysis_result = analyze_messages_with_deepseek(messages)
+
+            summaryAnswerStorage.objects.create(
+                UserId='00001',
+                Content=data,
+                ReturnTime=timezone.now(),
+                TopicSummary=analysis_result,
+                HealthScore='None',
+                Memo='None'
+            )
+            # 部分数据先暂时mock，到时候根据用户来去确定
+            return Response({
+                "code": 200,
+                "message": "返回成功",
+                "response": analysis_result
+            }, status=status.HTTP_200_OK)
+
+        except json.JSONDecodeError:
+            return Response({"error": "Invalid JSON data"}, status=status.HTTP_400_BAD_REQUEST)
+        except UnicodeDecodeError:
+            return Response({"error": "Data encoding error, please use UTF-8"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Server error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

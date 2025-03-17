@@ -4,31 +4,55 @@ from django.db import models
 from django.utils.encoding import smart_str
 
 """获取AI与人之间聊天的内容并进行存储"""
+
+
 class AiWithUserChatingInformation(models.Model):
     UserId = models.CharField(max_length=100, default="default_user")
     Role = models.CharField(max_length=10, choices=[("user", "User"), ("assistant", "Assistant")])
     Content = models.TextField()
-    TopicName = models.CharField(verbose_name="话题名称",max_length=40)
-    TopicStartTime = models.TimeField(verbose_name="话题开始时间",default=timezone.now)
+    TopicName = models.CharField(verbose_name="话题名称", max_length=40)
+    TopicStartTime = models.TimeField(verbose_name="话题开始时间", default=timezone.now)
     TopicEndTime = models.TimeField(verbose_name="话题结束时间", default=timezone.now)
-    KeyMan = models.TextField(verbose_name="关键人物",max_length=50)
-    TopicSummary = models.TextField(verbose_name="话题总结",max_length=60)
-    HealthScore = models.CharField(verbose_name="心理健康打分",max_length=60)
+    KeyMan = models.TextField(verbose_name="关键人物", max_length=50)
+    TopicSummary = models.TextField(verbose_name="话题总结", max_length=60)
+    HealthScore = models.CharField(verbose_name="心理健康打分", max_length=60)
     TopicSensitiveLevel = models.IntegerField(verbose_name="话题敏感度级别",
                                               choices=((1, "一级"), (2, "二级"), (3, "三级"), (4, "四级"), (5, "五级")),
                                               default=1)
-    PredictivePsychology = models.IntegerField(verbose_name="健康等级", choices=((1, "优秀"), (2, "良好"),(3, "一般"), (4, "较差"), (5, "差")), default=3)
-    Memo = models.TextField(verbose_name="备注信息",null=True,default="无")
+    PredictivePsychology = models.IntegerField(verbose_name="健康等级",
+                                               choices=((1, "优秀"), (2, "良好"), (3, "一般"), (4, "较差"), (5, "差")),
+                                               default=3)
+    Memo = models.TextField(verbose_name="备注信息", null=True, default="无")
 
     def __str__(self):
         return smart_str('%s-%s' % (self.TopicName, self.TopicStartTime))
+
     class Meta:
         db_table = "ChattingWithAI"
         verbose_name = 'AI聊天'
         verbose_name_plural = 'AI聊天存储'
+
     @property
     def is_authenticated(self):
         return True
+
+class summaryAnswerStorage(models.Model):
+    UserId = models.CharField(max_length=100, default="default_user")
+    Content = models.TextField()
+    ReturnTime = models.TimeField(verbose_name="返回时间", default=timezone.now)
+    TopicSummary = models.TextField(verbose_name="话题总结", max_length=60)
+    HealthScore = models.CharField(verbose_name="心理健康打分", max_length=60)
+    Memo = models.TextField(verbose_name="备注信息", null=True, default="无")
+    class Meta:
+        verbose_name = "聊天列表反响"
+        verbose_name_plural = "聊天列表反响"
+
+    def __str__(self):
+        return f"{self.Content[:20]} (ReturnTime: {self.ReturnTime})"
+
+
+
+
 class traditionalAnsweringMode(models.Model):
     content = models.CharField(
         max_length=200,
@@ -54,6 +78,7 @@ class traditionalAnsweringMode(models.Model):
 
     def __str__(self):
         return f"{self.content[:20]} (index: {self.index})"
+
 
 class QuestionHistory(models.Model):
     user = models.ForeignKey(

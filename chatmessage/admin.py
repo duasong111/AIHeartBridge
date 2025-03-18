@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, register
-from .models import AiWithUserChatingInformation,traditionalAnsweringMode,QuestionHistory
+from .models import AiWithUserChatingInformation,traditionalAnsweringMode,\
+    QuestionHistory,summaryAnswerStorage
 
 
 
@@ -13,6 +14,16 @@ class AiWithUserChatingShow(admin.ModelAdmin):
         ("备注", {'fields': ['Memo']}),
     )
     list_display = ('id', 'TopicName', 'TopicStartTime', 'TopicEndTime', 'TopicSensitiveLevel')
+
+#将用户的列表消息分类后进行展示
+@admin.register(summaryAnswerStorage)
+class SummaryMessageList(admin.ModelAdmin):
+    fieldsets = (
+        ("用户", {'fields': ['UserId',  'Content']}),
+        ("其他", {'fields': ['TopicSummary','ReturnTime','HealthScore','Memo']}),
+    )
+    list_display = ('UserId', 'Content', 'TopicSummary', 'HealthScore', 'ReturnTime')
+
 
 #展示其他数据库的内容
 @admin.register(traditionalAnsweringMode)

@@ -6,6 +6,8 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
 from .models import Language, Project
+
+from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
 from rest_framework import exceptions
 
@@ -39,7 +41,6 @@ class RegisterSerializers(serializers.ModelSerializer):
 # 用户注册功能
 class RegisterView(APIView):
     def post(self, request):
-        print("Request data:", request.data)
         ser = RegisterSerializers(data=request.data)
         if ser.is_valid():
             user = ser.save()  # 调用 save 并获取创建的对象
@@ -62,11 +63,9 @@ class LoginSerializers(serializers.ModelSerializer):
         fields = ["Account", "PassWord"]        #则要求必须输入的检验数据
 class LoginView(APIView):
     def post(self, request):
-
         ser = LoginSerializers(data=request.data)
         if not ser.is_valid():
             return Response({"code": 1001, "error": "校验失败", "detail": ser.errors})
-
         instance = models.userInfo.objects.filter(**ser.validated_data).first()
         if not instance:
             return Response({"code": 1001, "error": "用户名或密码错误"})
@@ -84,13 +83,10 @@ class NewsInformationSerializer(serializers.ModelSerializer):
 
 class NewsInformationView(APIView):
     authentication_classes = []
-
     # 这个是将所有的领域的信息来进行返回
     def get(self, request, *args, **kwargs):
-
         data = models.Language.objects.all()
         serializer = NewsInformationSerializer(data, many=True)
-
         return Response({"code": 200, "message": "获取新闻列表成功", "data": serializer.data})
 
 
@@ -132,9 +128,24 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         return list(grouped_data.values())
 class NewsDetailView(APIView):
     authentication_classes = []
-
     # 某个领域内的获奖的状况来进行展示
     def get(self, request, *args, **kwargs):
         data = Project.objects.all()
         serializer = NewsDetailSerializer(data, many=True)
         return Response({"code": 200, "message": "获取数据成功", "data": serializer.data[0]})
+
+class PsychometricDetailSerializer(serializers.ModelSerializer):
+    ReturnTime = serializers.DateTimeField(format="%Y-%m-%d")
+    class Meta:
+        model = summaryAnswerStorage
+        fields = ['TopicSummary','HealthScore','ReturnTime','Memo']
+
+
+class GetPsychometricsView(APIView):
+    authentication_classes = []
+    # 进行心理测评的展示信息
+    def get(self, request, *args, **kwargs):
+        data = summaryAnswerStorage.objects.all()
+        serializer = PsychometricDetailSerializer(data, many=True)
+        return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
+

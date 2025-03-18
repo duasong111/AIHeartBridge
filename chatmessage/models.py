@@ -37,10 +37,10 @@ class AiWithUserChatingInformation(models.Model):
         return True
 
 class summaryAnswerStorage(models.Model):
-    UserId = models.CharField(max_length=100, default="default_user")
-    Content = models.TextField()
-    ReturnTime = models.TimeField(verbose_name="返回时间", default=timezone.now)
-    TopicSummary = models.TextField(verbose_name="话题总结", max_length=60)
+    UserId = models.CharField(max_length=100, verbose_name="用户ID",default="default_user")
+    Content = models.TextField(verbose_name="聊天内容",)
+    ReturnTime = models.DateTimeField(verbose_name="返回时间", default=timezone.now)
+    TopicSummary = models.TextField(verbose_name="话题总结", max_length=1000)
     HealthScore = models.CharField(verbose_name="心理健康打分", max_length=60)
     Memo = models.TextField(verbose_name="备注信息", null=True, default="无")
     class Meta:

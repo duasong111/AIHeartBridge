@@ -32,7 +32,6 @@ class userInfo(models.Model):
         """
         return True
 
-
 # 新闻类型进行添加
 class Language(models.Model):
     Name = models.CharField(verbose_name="新闻类型", max_length=32)
@@ -67,3 +66,29 @@ class Project(models.Model):
         db_table = "news_project"
         verbose_name = '新闻报道'
         verbose_name_plural = '新闻报道'
+
+#心理测评数据存储
+class QuickAssessment(models.Model):
+    user = models.CharField(verbose_name="用户名", max_length=32,null=True, blank=True)
+    testTitile = models.CharField(verbose_name="题目",max_length=640,null=True, blank=True)
+    testTime = models.DateTimeField(verbose_name="测试时间",null=True, blank=True)
+    def __str__(self):
+        return self.user
+    class Meta:
+        db_table = "quick_assessment_db"
+        verbose_name = '快速测评'
+        verbose_name_plural = '快速测评题目集'
+
+#快速测评选择集
+class QuickAssessmentSelected(models.Model):
+    user = models.CharField(verbose_name="用户名", max_length=32, null=True, blank=True)
+    randomQuestions = models.JSONField(verbose_name="所出题目")
+    selected = models.JSONField(verbose_name="选择的内容", default=list)
+    latestScore = models.IntegerField(verbose_name="最终得分",null=True, blank=True)
+    testTime = models.DateTimeField(verbose_name="测试时间",null=True, blank=True)
+    def __str__(self):
+        return self.user
+    class Meta:
+        db_table = "quick_assessment_result_db"
+        verbose_name = '快评结果'
+        verbose_name_plural = '快评结果集'

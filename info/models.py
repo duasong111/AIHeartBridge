@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils.encoding import smart_str
 # Create your models here.
@@ -69,9 +71,12 @@ class Project(models.Model):
 
 #心理测评数据存储
 class QuickAssessment(models.Model):
+    userId = models.CharField(max_length=100, verbose_name="用户ID", default=uuid.uuid4())
     user = models.CharField(verbose_name="用户名", max_length=32,null=True, blank=True)
     testTitile = models.CharField(verbose_name="题目",max_length=640,null=True, blank=True)
     testTime = models.DateTimeField(verbose_name="测试时间",null=True, blank=True)
+    index = models.IntegerField(verbose_name="下标",null=True, blank=True)
+    score = models.IntegerField(verbose_name="分数",null=True, default = 0 )
     def __str__(self):
         return self.user
     class Meta:
@@ -81,6 +86,7 @@ class QuickAssessment(models.Model):
 
 #快速测评选择集
 class QuickAssessmentSelected(models.Model):
+    userId = models.CharField(max_length=100, verbose_name="用户ID", default=uuid.uuid4())
     user = models.CharField(verbose_name="用户名", max_length=32, null=True, blank=True)
     randomQuestions = models.JSONField(verbose_name="所出题目")
     selected = models.JSONField(verbose_name="选择的内容", default=list)

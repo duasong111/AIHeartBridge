@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
-from .models import Language, Project
+from .models import Language, Project,QuickAssessment
 
 from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
@@ -147,5 +147,20 @@ class GetPsychometricsView(APIView):
     def get(self, request, *args, **kwargs):
         data = summaryAnswerStorage.objects.all()
         serializer = PsychometricDetailSerializer(data, many=True)
+        return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
+
+#得到所有的数据的序列化
+class GetTestQuestionsSerializer(serializers.ModelSerializer):
+    testTime = serializers.DateTimeField(format="%Y-%m-%d")
+    class Meta:
+        model = QuickAssessment
+        fields = ['userId','user','testTitile','testTime','index','score']
+
+class GetTestQuestions(APIView):
+    #获取测评的所有的数据
+    authentication_classes = []
+    def get(self,request,*args, **kwargs):
+        data = QuickAssessment.objects.all()
+        serializer = GetTestQuestionsSerializer(data, many=True)
         return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
 

@@ -10,7 +10,6 @@ class userInfoShow(admin.ModelAdmin):
     )
     list_display = ('id', 'Name', 'Account', 'Country', 'Sex', 'HealthGrade','LastLoginTime')
 
-
 @register(Language)
 class Language(admin.ModelAdmin):
 
@@ -28,7 +27,7 @@ class QuickAssessment(admin.ModelAdmin):
     fieldsets = (
         ("有关", {'fields': ['user',  'testTitile','testTime']}),
     )
-    list_display = ('id','user','testTitile','testTime' )
+    list_display = ('userId','user','testTitile','index','score','testTime' )
 
 @register(QuickAssessmentSelected)
 class QuickAssessmentSelected(admin.ModelAdmin):

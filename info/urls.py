@@ -18,5 +18,7 @@ urlpatterns = [
     #新闻记录存储
     path('info-newslistdetail/', views.NewsDetailView.as_view(), name='newsdetail'),
     #去存储有关心理健康15条数据集合返回
-    path('info-psychometrics/',views.GetPsychometricsView.as_view(),name='psychometrics')
+    path('info-psychometrics/',views.GetPsychometricsView.as_view(),name='psychometrics'),
+    #去获取用户的聊天数据的返回列表
+    path('info-getquestionlist/',views.GetTestQuestions.as_view(),name='getquestionlist')
 ]

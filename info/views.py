@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
 from .models import Language, Project,QuickAssessment
-
+from staticData import HealthLevelData
 from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
 from rest_framework import exceptions
@@ -160,7 +160,16 @@ class GetTestQuestions(APIView):
     #获取测评的所有的数据
     authentication_classes = []
     def get(self,request,*args, **kwargs):
-        data = QuickAssessment.objects.all()
+        data = QuickAssessment.objects.order_by('?')[:20]
         serializer = GetTestQuestionsSerializer(data, many=True)
         return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
+
+class GetTestDatas(APIView):
+    # 发送所有的测评数据(是一个小的接口)
+    authentication_classes = []
+    def get(self,request,*args, **kwargs):
+        #这个接口待封装
+        pass
+
+        # return Response({"code": 200, "message": "获取数据成功", "data": HealthLevelData})
 

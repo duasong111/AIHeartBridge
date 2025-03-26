@@ -20,5 +20,7 @@ urlpatterns = [
     #去存储有关心理健康15条数据集合返回
     path('info-psychometrics/',views.GetPsychometricsView.as_view(),name='psychometrics'),
     #去获取用户的聊天数据的返回列表
-    path('info-getquestionlist/',views.GetTestQuestions.as_view(),name='getquestionlist')
+    path('info-getquestionlist/',views.GetTestQuestions.as_view(),name='getquestionlist'),
+    #去发送所有的测评的数据
+    path('info-sendalltestdata/',views.GetTestDatas.as_view(),name='sendalltestdata')
 ]

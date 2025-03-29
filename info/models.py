@@ -88,7 +88,7 @@ class QuickAssessment(models.Model):
 class QuickAssessmentSelected(models.Model):
     userId = models.CharField(max_length=100, verbose_name="用户ID", default=uuid.uuid4())
     user = models.CharField(verbose_name="用户名", max_length=32, null=True, blank=True)
-    randomQuestions = models.JSONField(verbose_name="所出题目")
+    randomQuestions = models.JSONField(verbose_name="所选题目集")
     selected = models.JSONField(verbose_name="选择的内容", default=list)
     latestScore = models.IntegerField(verbose_name="最终得分",null=True, blank=True)
     testTime = models.DateTimeField(verbose_name="测试时间",null=True, blank=True)

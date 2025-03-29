@@ -21,6 +21,8 @@ urlpatterns = [
     path('info-psychometrics/',views.GetPsychometricsView.as_view(),name='psychometrics'),
     #去获取用户的聊天数据的返回列表
     path('info-getquestionlist/',views.GetTestQuestions.as_view(),name='getquestionlist'),
+    # 对用户选择过的东西去进行一个归纳总结
+    path('info-assessmentsummary/',views.QuickAssessmentsummarize.as_view(),name='assessmentsummary'),
     #去发送所有的测评的数据
     path('info-sendalltestdata/',views.GetTestDatas.as_view(),name='sendalltestdata')
 ]

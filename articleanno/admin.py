@@ -7,10 +7,10 @@ from .models import Notices, About,News
 class AboutAdmin(ModelAdmin):
     ordering = ('id',)
     fieldsets = (
-        ("类型", {'fields': ['type']}),
+        ("类型", {'fields': ['type','is_show']}),
         ("内容", {'fields': ['title', 'content', 'url', 'dates']}),
     )
-    list_display = ('id', 'type', 'title', 'dates')
+    list_display = ('id', 'type', 'title','content','is_show', 'dates')
 
 
 @register(Notices)

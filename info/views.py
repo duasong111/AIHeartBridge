@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 import uuid
 from django.shortcuts import render, HttpResponse
@@ -5,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
-from .models import Language, Project,QuickAssessment
 from staticData import HealthLevelData
+from .models import Language, Project,QuickAssessment,QuickAssessmentSelected
 from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
 from rest_framework import exceptions
@@ -75,7 +77,6 @@ class LoginView(APIView):
         instance.save()
         return Response({"code": 200, "message": "登录成功", "token": token})
 
-
 class NewsInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
@@ -88,7 +89,6 @@ class NewsInformationView(APIView):
         data = models.Language.objects.all()
         serializer = NewsInformationSerializer(data, many=True)
         return Response({"code": 200, "message": "获取新闻列表成功", "data": serializer.data})
-
 
 class NewsDetailSerializer(serializers.ModelSerializer):
     LANGUAGE_CHOICES = {
@@ -140,7 +140,6 @@ class PsychometricDetailSerializer(serializers.ModelSerializer):
         model = summaryAnswerStorage
         fields = ['TopicSummary','HealthScore','ReturnTime','Memo']
 
-
 class GetPsychometricsView(APIView):
     authentication_classes = []
     # 进行心理测评的展示信息
@@ -149,7 +148,7 @@ class GetPsychometricsView(APIView):
         serializer = PsychometricDetailSerializer(data, many=True)
         return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
 
-#得到所有的数据的序列化
+# 得到所有的数据的序列化
 class GetTestQuestionsSerializer(serializers.ModelSerializer):
     testTime = serializers.DateTimeField(format="%Y-%m-%d")
     class Meta:
@@ -157,19 +156,85 @@ class GetTestQuestionsSerializer(serializers.ModelSerializer):
         fields = ['userId','user','testTitile','testTime','index','score']
 
 class GetTestQuestions(APIView):
-    #获取测评的所有的数据
+    # 获取测评的随机20条数据进行返回
     authentication_classes = []
     def get(self,request,*args, **kwargs):
         data = QuickAssessment.objects.order_by('?')[:20]
         serializer = GetTestQuestionsSerializer(data, many=True)
         return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
 
+# 对用户进行选择的数据进行一个归纳
+class QuickAssessmentsummarize(APIView):
+    authentication_classes = []
+    def post(self,request,*args, **kwargs):
+        # 将用户选择的20条数据进行归纳 -- QuickAssessmentSelected
+        try:
+            # 提取数据
+            user = request.data.get('user')
+            random_questions = request.data.get('randomQuestions', [])
+            selected = request.data.get('selected', [])
+            latest_score = request.data.get('latestScore')
+            test_time = request.data.get('testTime')
+            # 处理 selected，将 None 替换为 0
+            if not isinstance(selected, list):
+                selected = []
+            processed_selected = [0 if item is None else item for item in selected]
+            # 处理 randomQuestions，转换为目标格式
+            if not isinstance(random_questions, list):
+                random_questions = []
+            # 分组并精简数据
+            grouped_data = {}
+            for item in random_questions:
+                user_key = (item['user'], item['userId'])  # 用 (user, userId) 作为唯一键
+                if user_key not in grouped_data:
+                    grouped_data[user_key] = {
+                        "user": item['user'],
+                        "userId": item['userId'],
+                        "testData": [],
+                        "testTime": item['testTime']  # 使用第一条记录的时间
+                    }
+                grouped_data[user_key]["testData"].append({
+                    "score": item['score'],
+                    "testTitile": item['testTitile']
+                })
+            # 转换为列表格式
+            processed_random_questions = list(grouped_data.values())
+            # 处理 latestScore
+            if latest_score is not None:
+                latest_score = int(latest_score)
+            # 处理 testTime，移除时区信息
+            if test_time:
+                dt = datetime.fromisoformat(test_time.replace('Z', '+00:00'))
+                test_time = dt.replace(tzinfo=None)
+            # 创建并保存
+            assessment = QuickAssessmentSelected(
+                user=user,
+                randomQuestions=processed_random_questions,  # 保存转换后的数据
+                selected=processed_selected,
+                latestScore=latest_score,
+                testTime=test_time
+            )
+            assessment.save()
+            # 返回响应
+            return Response({
+                "message": "数据保存成功",
+                "id": str(assessment.userId),
+                "saved_randomQuestions": assessment.randomQuestions,
+                "saved_selected": assessment.selected
+            }, status=201)
+        except ValueError as e:
+            return Response({"error": f"数据格式错误: {str(e)}"}, status=400)
+        except Exception as e:
+            return Response({"error": f"保存失败: {str(e)}"}, status=500)
+
 class GetTestDatas(APIView):
     # 发送所有的测评数据(是一个小的接口)
     authentication_classes = []
     def get(self,request,*args, **kwargs):
-        #这个接口待封装
-        pass
-
-        # return Response({"code": 200, "message": "获取数据成功", "data": HealthLevelData})
+        result_data ={
+            "code":200,
+            "message:":"获取数据成功",
+            "data":HealthLevelData
+        }
+        return Response(result_data)
 

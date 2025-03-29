@@ -51,7 +51,6 @@ class GetAboutSerializer(serializers.ModelSerializer):
         model = About
         fields = ["id", "title", "content", "is_show","dates","url"]
 
-
 #该区域是进行客户信息通告通知页面，管理员可在此进行发布通知
 class GetAboutView(APIView):
     # 无需认证

@@ -13,6 +13,8 @@ urlpatterns = [
     path('info-login/', views.LoginView.as_view(), name='login'),
     #用户进行注册
     path('info-register/', views.RegisterView.as_view(), name='register'),
+    #返回用户查询的数据结果
+    path('info-userinform/', views.ReturnUserInform.as_view(), name='userinform'),
     #新闻列表
     path('info-newslist/', views.NewsInformationView.as_view(), name='news'),
     #新闻记录存储

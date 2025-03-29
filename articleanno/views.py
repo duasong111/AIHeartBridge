@@ -49,7 +49,7 @@ class GetAboutSerializer(serializers.ModelSerializer):
     dates = serializers.DateTimeField(format="%Y-%m-%d")
     class Meta:
         model = About
-        fields = ["id", "title", "content", "is_show","dates","url"]
+        fields = ["id", "title", "content", "is_show","dates",'color',"url"]
 
 #该区域是进行客户信息通告通知页面，管理员可在此进行发布通知
 class GetAboutView(APIView):

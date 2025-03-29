@@ -8,7 +8,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
 from staticData import HealthLevelData
-from .models import Language, Project,QuickAssessment,QuickAssessmentSelected
+from .models import Language, Project,QuickAssessment,QuickAssessmentSelected,userInfo
 from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
 from rest_framework import exceptions
@@ -140,9 +140,10 @@ class PsychometricDetailSerializer(serializers.ModelSerializer):
         model = summaryAnswerStorage
         fields = ['TopicSummary','HealthScore','ReturnTime','Memo']
 
+
+    # 进行心理测评的展示信息
 class GetPsychometricsView(APIView):
     authentication_classes = []
-    # 进行心理测评的展示信息
     def get(self, request, *args, **kwargs):
         data = summaryAnswerStorage.objects.all()
         serializer = PsychometricDetailSerializer(data, many=True)
@@ -155,8 +156,8 @@ class GetTestQuestionsSerializer(serializers.ModelSerializer):
         model = QuickAssessment
         fields = ['userId','user','testTitile','testTime','index','score']
 
+ # 获取测评的随机20条数据进行返回
 class GetTestQuestions(APIView):
-    # 获取测评的随机20条数据进行返回
     authentication_classes = []
     def get(self,request,*args, **kwargs):
         data = QuickAssessment.objects.order_by('?')[:20]
@@ -227,8 +228,8 @@ class QuickAssessmentsummarize(APIView):
         except Exception as e:
             return Response({"error": f"保存失败: {str(e)}"}, status=500)
 
+# 发送所有的测评数据(是一个小的接口)
 class GetTestDatas(APIView):
-    # 发送所有的测评数据(是一个小的接口)
     authentication_classes = []
     def get(self,request,*args, **kwargs):
         result_data ={
@@ -238,3 +239,33 @@ class GetTestDatas(APIView):
         }
         return Response(result_data)
 
+#返回用户的所有的信息
+class ReturnUserInform(APIView):
+    authentication_classes = []
+    def post(self,request,*args,**kwargs):
+        try:
+            account = request.data.get('account')
+            if not account:
+                return Response({"error": "账户名不能为空"}, status=400)
+            user_records = userInfo.objects.filter(Account=account)
+            data = [
+                {
+                    "user": record.Name,
+                    "Account":record.Account,
+                    "email": record.Email,
+                    "Country":record.Country,
+                    "LastLoginTime":record.LastLoginTime,
+                    "Address":record.Address
+
+                }
+                for record in user_records
+            ]
+            # 返回响应
+            return Response({
+                "message": "查询成功",
+                "data": data
+            }, status=200)
+        except ValueError as e:
+            return Response({"error": f"数据格式错误: {str(e)}"}, status=400)
+        except Exception as e:
+            return Response({"error": f"保存失败: {str(e)}"}, status=500)

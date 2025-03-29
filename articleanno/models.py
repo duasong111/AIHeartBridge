@@ -10,6 +10,7 @@ class About(models.Model):
     title = models.CharField(verbose_name="标题", max_length=64)
     content = models.TextField(verbose_name="内容", max_length=512)
     is_show = models.BooleanField(verbose_name="是否展示", default=False)  # 新增布尔字段
+    color = models.CharField(verbose_name="颜色", max_length=64, default="#fff")
     dates = models.DateTimeField(verbose_name="时间", default=timezone.now)
     url = models.TextField(verbose_name="链接", max_length=512, null=True, blank=True, default="")
 
@@ -52,6 +53,7 @@ class News(models.Model):
     title = models.CharField(verbose_name="标题", max_length=64)
     content = models.TextField(verbose_name="内容", max_length=512)
     dates = models.DateTimeField(verbose_name="时间", default=timezone.now)
+    color = models.CharField(verbose_name="颜色", max_length=64,default="#fff")
     url = models.TextField(verbose_name="链接", max_length=512, null=True, blank=True, default="")
     is_show = models.BooleanField(verbose_name="是否展示", default=True, choices=((True, "是"), (False, "否")))
     def __str__(self):

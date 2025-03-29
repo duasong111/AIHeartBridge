@@ -8,9 +8,9 @@ class AboutAdmin(ModelAdmin):
     ordering = ('id',)
     fieldsets = (
         ("类型", {'fields': ['type','is_show']}),
-        ("内容", {'fields': ['title', 'content', 'url', 'dates']}),
+        ("内容", {'fields': ['title', 'content', 'url','color','dates']}),
     )
-    list_display = ('id', 'type', 'title','content','is_show', 'dates')
+    list_display = ('id', 'type', 'title','content','is_show','color','dates')
 
 
 @register(Notices)

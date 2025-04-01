@@ -12,7 +12,7 @@ class userInfo(models.Model):
     Age = models.IntegerField(verbose_name="年龄",null=True, blank=True)
     # Education = models.IntegerField(verbose_name="教育", choices=((1, "小学"), (2, "初中"),
     # (3, "高中（职高，高技）"), (4, "中专"),(5, "大专(高职)"), (6, "本科"),(7, "硕士研究生"), (8, "博士研究生")), default=6),
-
+    signature = models.CharField(verbose_name="个性签名",max_length=128,default="快乐活着")
     WorkingCondition=models.IntegerField(verbose_name="工作状态", choices=((1, "未曾工作"), (2, "工作中"), (3, "待就业")), default=1)
     HealthGrade= models.IntegerField(verbose_name="健康等级", choices=((1, "优秀"), (2, "良好"),(3, "一般"), (4, "较差"), (5, "差")), default=3)
     Country = models.CharField(verbose_name="国家", max_length=32,null=True, blank=True )

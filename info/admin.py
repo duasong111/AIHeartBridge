@@ -5,10 +5,10 @@ from .models import userInfo,Language, Project,QuickAssessment,QuickAssessmentSe
 class userInfoShow(admin.ModelAdmin):
     ordering = ('id',)
     fieldsets = (
-        ("个人信息", {'fields': ['Name','Account','Age','Country', 'Email','Sex','Address' ]}),
+        ("个人信息", {'fields': ['Name','Account','Age','Country','signature' ,'Email','Sex','Address' ]}),
         ("状态信息", {'fields': ['WorkingCondition','HealthGrade','PhoneNumber','LastLoginTime']}),
     )
-    list_display = ('id', 'Name', 'Account', 'Country', 'Sex', 'HealthGrade','LastLoginTime')
+    list_display = ('id', 'Name', 'Account', 'Country','signature' ,'Sex', 'HealthGrade','LastLoginTime')
 
 @register(Language)
 class Language(admin.ModelAdmin):

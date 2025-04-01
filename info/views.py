@@ -12,7 +12,7 @@ from .models import Language, Project,QuickAssessment,QuickAssessmentSelected,us
 from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
 from rest_framework import exceptions
-
+from API.DeepSeek import  analyze_messages_with_deepseek
 
 # Create your views here.
 class RegisterSerializers(serializers.ModelSerializer):
@@ -63,6 +63,8 @@ class LoginSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.userInfo
         fields = ["Account", "PassWord"]        #则要求必须输入的检验数据
+
+
 class LoginView(APIView):
     def post(self, request):
         ser = LoginSerializers(data=request.data)
@@ -71,11 +73,24 @@ class LoginView(APIView):
         instance = models.userInfo.objects.filter(**ser.validated_data).first()
         if not instance:
             return Response({"code": 1001, "error": "用户名或密码错误"})
-
+        # 获取当前日期
+        current_date = datetime.now().date()
+        # 如果是第一次登录，初始化 LastLoginTime
+        if not instance.LastLoginTime:
+            instance.LastLoginTime = current_date
+        # 生成新的 token
         token = str(uuid.uuid4())
         instance.Token = token
         instance.save()
-        return Response({"code": 200, "message": "登录成功", "token": token})
+        # 在下次登录时更新 LastLoginTime（这里只是展示逻辑）
+        # 实际需要额外的机制，比如在用户退出时更新
+        return Response({
+            "code": 200,
+            "message": "登录成功",
+            "token": token,
+            "last_login_date": str(instance.LastLoginTime) if instance.LastLoginTime else None,
+            "current_login_date": str(current_date)
+        })
 
 class NewsInformationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -167,7 +182,9 @@ class GetTestQuestions(APIView):
 # 对用户进行选择的数据进行一个归纳
 class QuickAssessmentsummarize(APIView):
     authentication_classes = []
-    def post(self,request,*args, **kwargs):
+    authentication_classes = []
+
+    def post(self, request, *args, **kwargs):
         # 将用户选择的20条数据进行归纳 -- QuickAssessmentSelected
         try:
             # 提取数据
@@ -176,14 +193,15 @@ class QuickAssessmentsummarize(APIView):
             selected = request.data.get('selected', [])
             latest_score = request.data.get('latestScore')
             test_time = request.data.get('testTime')
+
             # 处理 selected，将 None 替换为 0
             if not isinstance(selected, list):
                 selected = []
             processed_selected = [0 if item is None else item for item in selected]
+
             # 处理 randomQuestions，转换为目标格式
             if not isinstance(random_questions, list):
                 random_questions = []
-            # 分组并精简数据
             grouped_data = {}
             for item in random_questions:
                 user_key = (item['user'], item['userId'])  # 用 (user, userId) 作为唯一键
@@ -198,16 +216,18 @@ class QuickAssessmentsummarize(APIView):
                     "score": item['score'],
                     "testTitile": item['testTitile']
                 })
-            # 转换为列表格式
             processed_random_questions = list(grouped_data.values())
+
             # 处理 latestScore
             if latest_score is not None:
                 latest_score = int(latest_score)
+
             # 处理 testTime，移除时区信息
             if test_time:
                 dt = datetime.fromisoformat(test_time.replace('Z', '+00:00'))
                 test_time = dt.replace(tzinfo=None)
-            # 创建并保存
+
+            # 创建并保存到数据库
             assessment = QuickAssessmentSelected(
                 user=user,
                 randomQuestions=processed_random_questions,  # 保存转换后的数据
@@ -216,13 +236,30 @@ class QuickAssessmentsummarize(APIView):
                 testTime=test_time
             )
             assessment.save()
-            # 返回响应
+
+            # 调用 DeepSeek API 进行分析
+            # 将 randomQuestions 转换为 DeepSeek 需要的消息格式
+            messages_for_ai = []
+            for group in processed_random_questions:
+                for test in group["testData"]:
+                    messages_for_ai.append({
+                        "content": f"Score: {test['score']} for {test['testTitile']}",
+                        "sender": group["user"],
+                        "timestamp": group["testTime"]
+                    })
+
+            # 调用 DeepSeek 分析
+            ai_analysis = analyze_messages_with_deepseek(messages_for_ai)
+
+            # 返回响应，包含 AI 分析结果
             return Response({
-                "message": "数据保存成功",
+                "message": "数据保存成功并完成AI分析",
                 "id": str(assessment.userId),
                 "saved_randomQuestions": assessment.randomQuestions,
-                "saved_selected": assessment.selected
+                "saved_selected": assessment.selected,
+                "ai_analysis": ai_analysis  # 添加 AI 分析结果
             }, status=201)
+
         except ValueError as e:
             return Response({"error": f"数据格式错误: {str(e)}"}, status=400)
         except Exception as e:
@@ -253,6 +290,7 @@ class ReturnUserInform(APIView):
                     "user": record.Name,
                     "Account":record.Account,
                     "email": record.Email,
+                    "signature":record.signature,
                     "Country":record.Country,
                     "LastLoginTime":record.LastLoginTime,
                     "Address":record.Address

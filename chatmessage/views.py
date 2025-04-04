@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from API.AIMod2 import get_spark_response, trim_history  # 导入封装好的函数
+# from staticData import AINoticeWordAnalyse
 from .models import AiWithUserChatingInformation,summaryAnswerStorage
 from API.DeepSeek import analyze_messages_with_deepseek
 

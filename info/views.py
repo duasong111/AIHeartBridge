@@ -2,12 +2,13 @@ from datetime import datetime
 
 from django.shortcuts import render
 import uuid
+import json
 from django.shortcuts import render, HttpResponse
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
 from info import models
-from staticData import HealthLevelData
+from staticData import HealthLevelData,AINoticeWordAnalyse
 from .models import Language, Project,QuickAssessment,QuickAssessmentSelected,userInfo
 from chatmessage.models import  summaryAnswerStorage
 from rest_framework import status
@@ -182,7 +183,6 @@ class GetTestQuestions(APIView):
 # 对用户进行选择的数据进行一个归纳
 class QuickAssessmentsummarize(APIView):
     authentication_classes = []
-    authentication_classes = []
 
     def post(self, request, *args, **kwargs):
         # 将用户选择的20条数据进行归纳 -- QuickAssessmentSelected
@@ -248,17 +248,21 @@ class QuickAssessmentsummarize(APIView):
                         "timestamp": group["testTime"]
                     })
 
-            # 调用 DeepSeek 分析
-            ai_analysis = analyze_messages_with_deepseek(messages_for_ai)
 
-            # 返回响应，包含 AI 分析结果
+            # 调用 DeepSeek 分析
+            ai_analysis = analyze_messages_with_deepseek(messages_for_ai,AINoticeWordAnalyse)
+            '''需要改进的地方就是给AI一些特定的返回格式，以及前端需要去等一会，需要去等一小段时间，在
+            等的过程中显示Ai正在分析的页面'''
+            # 返回响应，包含 AI
             return Response({
                 "message": "数据保存成功并完成AI分析",
                 "id": str(assessment.userId),
                 "saved_randomQuestions": assessment.randomQuestions,
                 "saved_selected": assessment.selected,
                 "ai_analysis": ai_analysis  # 添加 AI 分析结果
-            }, status=201)
+            }, status=200)
+
+
 
         except ValueError as e:
             return Response({"error": f"数据格式错误: {str(e)}"}, status=400)

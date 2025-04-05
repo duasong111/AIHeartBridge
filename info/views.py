@@ -170,13 +170,17 @@ class GetTestQuestionsSerializer(serializers.ModelSerializer):
     testTime = serializers.DateTimeField(format="%Y-%m-%d")
     class Meta:
         model = QuickAssessment
-        fields = ['userId','user','testTitile','testTime','index','score']
+        fields = ['userId','user','testTitile','testTime','index','score','testType']
 
  # 获取测评的随机20条数据进行返回
 class GetTestQuestions(APIView):
     authentication_classes = []
-    def get(self,request,*args, **kwargs):
-        data = QuickAssessment.objects.order_by('?')[:20]
+    def post(self,request,*args, **kwargs):
+        test_type = request.data.get('type')
+        if test_type is not None:
+            data = QuickAssessment.objects.filter(testType=test_type).order_by('?')[:20]
+        else: # 有检索类型返回检索类型，没有检索类型就按照全部的去进行返回
+            data = QuickAssessment.objects.order_by('?')[:20]
         serializer = GetTestQuestionsSerializer(data, many=True)
         return Response({"code": 200, "message": "获取数据成功", "data": serializer.data})
 

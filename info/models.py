@@ -77,6 +77,8 @@ class QuickAssessment(models.Model):
     testTime = models.DateTimeField(verbose_name="测试时间",null=True, blank=True)
     index = models.IntegerField(verbose_name="下标",null=True, blank=True)
     score = models.IntegerField(verbose_name="分数",null=True, default = 0 )
+    '''心理测评类型1-心理健康问卷，2-情感问卷 3-人格测试'''
+    testType = models.IntegerField(verbose_name="测试类型",null=True,default=1)
     def __str__(self):
         return self.user
     class Meta:

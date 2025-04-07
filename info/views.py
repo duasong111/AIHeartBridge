@@ -187,7 +187,6 @@ class GetTestQuestions(APIView):
 # 对用户进行选择的数据进行一个归纳
 class QuickAssessmentsummarize(APIView):
     authentication_classes = []
-
     def post(self, request, *args, **kwargs):
         # 将用户选择的20条数据进行归纳 -- QuickAssessmentSelected
         try:
@@ -197,12 +196,10 @@ class QuickAssessmentsummarize(APIView):
             selected = request.data.get('selected', [])
             latest_score = request.data.get('latestScore')
             test_time = request.data.get('testTime')
-
             # 处理 selected，将 None 替换为 0
             if not isinstance(selected, list):
                 selected = []
             processed_selected = [0 if item is None else item for item in selected]
-
             # 处理 randomQuestions，转换为目标格式
             if not isinstance(random_questions, list):
                 random_questions = []

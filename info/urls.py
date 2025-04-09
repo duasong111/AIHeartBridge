@@ -25,6 +25,6 @@ urlpatterns = [
     path('info-getquestionlist/',views.GetTestQuestions.as_view(),name='getquestionlist'),
     # 对用户选择过的东西去进行一个归纳总结
     path('info-assessmentsummary/',views.QuickAssessmentsummarize.as_view(),name='assessmentsummary'),
-    #去发送所有的测评的数据
+    #去发送所有的测评的数据---
     path('info-sendalltestdata/',views.GetTestDatas.as_view(),name='sendalltestdata')
 ]

@@ -7,5 +7,7 @@ urlpatterns = [
     path('ai-chat/', views.AIWithUserChatView.as_view(), name='chat'),
     # 用户与AI进行聊天的内容，每十次进行一个数据更新处理
     path('ai-messagedel/', views.AIDealChatMessageView.as_view(), name='deal-message'),
+    # 实现语音进行说明
+    path('audio-play/', views.AudioPlay.as_view(), name='audio-play'),
 
 ]

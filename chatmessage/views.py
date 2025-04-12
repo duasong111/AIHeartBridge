@@ -1,17 +1,18 @@
 import json
 from datetime import datetime
-
+import requests
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.http import HttpResponse
 from API.AIMod2 import get_spark_response, trim_history  # 导入封装好的函数
 # from staticData import AINoticeWordAnalyse
 from .models import AiWithUserChatingInformation,summaryAnswerStorage
 from API.DeepSeek import analyze_messages_with_deepseek
-
+from API.convert2 import text_to_speech
 
 class AIWithUserChatView(APIView):
     authentication_classes = []  # 无需认证
@@ -138,3 +139,25 @@ class AIDealChatMessageView(APIView):
             return Response({"error": "Data encoding error, please use UTF-8"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": f"Server error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AudioPlay(APIView):
+    authentication_classes = []  # 无需认证
+    def post(self, request):
+        """
+        接收前端传来的文本并调用文字转语音接口，返回音频数据。
+        """
+        # 获取前端传来的文本
+        text = request.data.get('text')  # 使用 .data 获取 JSON 请求数据
+
+        # 调用文字转语音函数
+        audio_data = text_to_speech(text)
+
+        if audio_data:
+            # 返回音频数据给前端
+            response = HttpResponse(audio_data, content_type="audio/mpeg")
+            response['Content-Disposition'] = 'attachment; filename="output.mp3"'
+            return response
+        else:
+            # 如果转换失败，返回错误信息
+            return HttpResponse("语音转换失败", status=500)

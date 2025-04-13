@@ -184,9 +184,9 @@ class SpeechToText(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         audio_file = request.FILES["audio"]
+        print("audio_file",audio_file)
         try:
             audio_data = audio_file.read()
-            print(f"收到音频文件: {audio_file.name}, 大小: {len(audio_data)} 字节")
         except Exception as e:
             return Response(
                 {"error": f"读取音频文件失败: {str(e)}"},
@@ -198,8 +198,6 @@ class SpeechToText(APIView):
         debug_path = f"debug_uploaded.{file_ext}"
         with open(debug_path, "wb") as f:
             f.write(audio_data)
-        print(f"已保存上传文件到: {debug_path}")
-
         if file_ext not in ["wav", "pcm"]:
             return Response(
                 {"error": "仅支持wav或pcm格式"},
@@ -212,13 +210,14 @@ class SpeechToText(APIView):
             audio_format=file_ext,
             sample_rate=16000
         )
-        print(f"百度API返回: {result}")
         if result.get("error"):
             return Response(
                 {"error": result["error"]},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         return Response(
-            {"text": result["text"]},
+            {   "code":200,
+                "message":"数据返回成功",
+                "text": result["text"]},
             status=status.HTTP_200_OK
         )

@@ -97,9 +97,9 @@ def speech_to_text(audio_data, audio_format="wav", sample_rate=16000):
     }
 
     try:
-        print(f"发送请求到: {url}")
-        print(f"请求参数: {json.dumps(payload, indent=2)}")
-        print(f"音频数据大小: {len(audio_data)} 字节")
+        # print(f"发送请求到: {url}")
+        # print(f"请求参数: {json.dumps(payload, indent=2)}")
+        # print(f"音频数据大小: {len(audio_data)} 字节")
 
         # 发送POST请求
         response = requests.post(
@@ -112,8 +112,6 @@ def speech_to_text(audio_data, audio_format="wav", sample_rate=16000):
         )
         response.raise_for_status()
         result = response.json()
-        print(f"API 返回结果: {json.dumps(result, indent=2)}")
-
         if "result" in result and result["result"]:
             return {"text": result["result"][0], "error": None}
         else:
@@ -126,7 +124,6 @@ def speech_to_text(audio_data, audio_format="wav", sample_rate=16000):
 if __name__ == '__main__':
     # 测试音频文件路径
     audio_file_path = "output.mp3"
-
     # 检查文件是否存在
     if not os.path.exists(audio_file_path):
         print(f"错误: 音频文件 {audio_file_path} 不存在")
@@ -138,7 +135,6 @@ if __name__ == '__main__':
                 print("转换 WAV 失败，退出")
             else:
                 print(f"成功转换为 WAV，大小: {len(wav_data)} 字节")
-
                 # 调用语音转文字
                 result = speech_to_text(wav_data, audio_format="wav", sample_rate=16000)
                 print(f"最终结果: {result}")

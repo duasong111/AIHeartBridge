@@ -1,5 +1,9 @@
+import base64
 import json
+import os
 from datetime import datetime
+
+import librosa
 import requests
 from django.http import JsonResponse
 from django.utils import timezone
@@ -7,12 +11,14 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import soundfile as sf
 from django.http import HttpResponse
 from API.AIMod2 import get_spark_response, trim_history  # 导入封装好的函数
 # from staticData import AINoticeWordAnalyse
 from .models import AiWithUserChatingInformation,summaryAnswerStorage
 from API.DeepSeek import analyze_messages_with_deepseek
 from API.convert2 import text_to_speech
+from API.Convert1 import speech_to_text
 
 class AIWithUserChatView(APIView):
     authentication_classes = []  # 无需认证
@@ -145,19 +151,74 @@ class AudioPlay(APIView):
     authentication_classes = []  # 无需认证
     def post(self, request):
         """
-        接收前端传来的文本并调用文字转语音接口，返回音频数据。
+        接收前端传来的文本并调用文字转语音接口，返回 Base64 编码的音频数据
         """
         # 获取前端传来的文本
-        text = request.data.get('text')  # 使用 .data 获取 JSON 请求数据
-
-        # 调用文字转语音函数
+        text = request.data.get('text')
+        # 调用文字转语音函数（假设返回的是二进制音频数据）
         audio_data = text_to_speech(text)
-
         if audio_data:
-            # 返回音频数据给前端
-            response = HttpResponse(audio_data, content_type="audio/mpeg")
-            response['Content-Disposition'] = 'attachment; filename="output.mp3"'
-            return response
+            # 将二进制音频数据编码为 Base64
+            audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+            # 返回 JSON 响应，包含 Base64 编码的音频数据
+            return JsonResponse({
+                'status': 'success',
+                'audio_data': audio_base64,
+                'format': 'mp3'  # 可选，告诉前端音频格式
+            })
         else:
             # 如果转换失败，返回错误信息
-            return HttpResponse("语音转换失败", status=500)
+            return JsonResponse({'status': 'error', 'message': '语音转换失败'}, status=500)
+
+
+class SpeechToText(APIView):
+    authentication_classes = []  # 无需认证
+
+    def post(self, request, *args, **kwargs):
+        """
+        接收微信小程序上传的音频文件，调用百度API转为文字并返回结果。
+        """
+        if "audio" not in request.FILES:
+            return Response(
+                {"error": "未上传音频文件"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        audio_file = request.FILES["audio"]
+        try:
+            audio_data = audio_file.read()
+            print(f"收到音频文件: {audio_file.name}, 大小: {len(audio_data)} 字节")
+        except Exception as e:
+            return Response(
+                {"error": f"读取音频文件失败: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 保存上传文件（调试用，保持与文件扩展名一致）
+        file_ext = os.path.splitext(audio_file.name)[1].lower().lstrip(".")
+        debug_path = f"debug_uploaded.{file_ext}"
+        with open(debug_path, "wb") as f:
+            f.write(audio_data)
+        print(f"已保存上传文件到: {debug_path}")
+
+        if file_ext not in ["wav", "pcm"]:
+            return Response(
+                {"error": "仅支持wav或pcm格式"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 直接调用 speech_to_text（WAV 无需转换）
+        result = speech_to_text(
+            audio_data=audio_data,
+            audio_format=file_ext,
+            sample_rate=16000
+        )
+        print(f"百度API返回: {result}")
+        if result.get("error"):
+            return Response(
+                {"error": result["error"]},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return Response(
+            {"text": result["text"]},
+            status=status.HTTP_200_OK
+        )

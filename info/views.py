@@ -314,5 +314,50 @@ class ReturnUserInform(APIView):
 # 更新用户信息
 class UpdateUserInform(APIView):
     authentication_classes = []
+
     def post(self, request, *args, **kwargs):
-        pass
+        # 获取前端传来的值
+        returnData = request.data
+        account = returnData.get('Account')  # 使用 Account 作为唯一标识
+        name = returnData.get('user')  # 前端的 user 对应后端的 Name
+        email = returnData.get('email')
+        country = returnData.get('Country')
+        address = returnData.get('Address')
+        phone = returnData.get('Phone')  # 前端的 Phone 对应后端的 PhoneNumber
+        signature = returnData.get('signature')
+
+        # 验证 Account 是否存在
+        if not account:
+            return Response(
+                {"error": "Account is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # 使用 Account 查询用户信息
+            user_info = models.userInfo.objects.filter(Account=account).first()
+
+            if not user_info:
+                return Response(
+                    {"error": "未找到该用户信息"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            # 更新用户信息的字段
+            user_info.Name = name if name else user_info.Name
+            user_info.Email = email if email else user_info.Email
+            user_info.Country = country if country else user_info.Country
+            user_info.Address = address if address else user_info.Address
+            user_info.PhoneNumber = phone if phone else user_info.PhoneNumber
+            user_info.signature = signature if signature else user_info.signature
+            user_info.save()
+
+            return Response(
+                {   "code" : 200,
+                    "message": "用户信息修改成功"},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

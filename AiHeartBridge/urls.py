@@ -26,5 +26,4 @@ urlpatterns = [
     path('chatmessage/', include(('chatmessage.urls', 'chatMessage'), namespace='chatMessage')),
     # 新闻，信息，通告展示接口
     path('newentrance/', include(('articleanno.urls', 'newEntrance'), namespace='newEntrance')),
-
 ]

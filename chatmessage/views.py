@@ -113,7 +113,6 @@ class AIDealChatMessageView(APIView):
                     {"error": "Request must contain a 'messageList' key with a list of messages"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
             messages = data["messageList"][:10]
             for msg in messages:
                 if not all(key in msg for key in ["content", "sender", "timestamp"]):
@@ -121,9 +120,7 @@ class AIDealChatMessageView(APIView):
                         {"error": "Each message must have 'content', 'sender', and 'timestamp'"},
                         status=status.HTTP_400_BAD_REQUEST
                     )
-
             analysis_result = analyze_messages_with_deepseek(messages)
-
             summaryAnswerStorage.objects.create(
                 UserId='00001',
                 Content=data,
@@ -170,7 +167,7 @@ class AudioPlay(APIView):
             # 如果转换失败，返回错误信息
             return JsonResponse({'status': 'error', 'message': '语音转换失败'}, status=500)
 
-
+# 语音转文字的功能
 class SpeechToText(APIView):
     authentication_classes = []  # 无需认证
 

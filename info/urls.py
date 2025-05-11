@@ -15,6 +15,8 @@ urlpatterns = [
     path('info-register/', views.RegisterView.as_view(), name='register'),
     #返回用户查询的数据结果
     path('info-userinform/', views.ReturnUserInform.as_view(), name='userinform'),
+    # 更新用户信息
+    path('info-updateuserinform/', views.UpdateUserInform.as_view(), name='updateuserinform'),
     #新闻列表
     path('info-newslist/', views.NewsInformationView.as_view(), name='news'),
     #新闻记录存储

@@ -25,7 +25,6 @@ class RegisterSerializers(serializers.ModelSerializer):
             "id": {"read_only": True},
             "PassWord": {"write_only": True}
         }
-
     def validate(self, attrs):
         # 在 validate 方法中统一验证
         if attrs["PassWord"] != attrs["confirm_password"]:
@@ -132,7 +131,6 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             "navRightItems": navRightItems
         }
         return result  # 返回包含 navLeftItems 和 navRightItems 的单个对象
-
     def group_data_by_language(self, data_list):
         grouped_data = {}
         for data in data_list:
@@ -222,7 +220,6 @@ class QuickAssessmentsummarize(APIView):
             # 处理 latestScore
             if latest_score is not None:
                 latest_score = int(latest_score)
-
             # 处理 testTime，移除时区信息
             if test_time:
                 dt = datetime.fromisoformat(test_time.replace('Z', '+00:00'))
@@ -254,6 +251,7 @@ class QuickAssessmentsummarize(APIView):
             ai_analysis = analyze_messages_with_deepseek(messages_for_ai,AINoticeWordAnalyse)
             '''需要改进的地方就是给AI一些特定的返回格式，以及前端需要去等一会，需要去等一小段时间，在
             等的过程中显示Ai正在分析的页面'''
+            print("打印AI分析的结果",ai_analysis)
             # 返回响应，包含 AI
             return Response({
                 "message": "数据保存成功并完成AI分析",
@@ -298,8 +296,8 @@ class ReturnUserInform(APIView):
                     "signature":record.signature,
                     "Country":record.Country,
                     "LastLoginTime":record.LastLoginTime,
-                    "Address":record.Address
-
+                    "Address":record.Address,
+                    "Phone": record.PhoneNumber
                 }
                 for record in user_records
             ]
@@ -312,3 +310,9 @@ class ReturnUserInform(APIView):
             return Response({"error": f"数据格式错误: {str(e)}"}, status=400)
         except Exception as e:
             return Response({"error": f"保存失败: {str(e)}"}, status=500)
+
+# 更新用户信息
+class UpdateUserInform(APIView):
+    authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        pass

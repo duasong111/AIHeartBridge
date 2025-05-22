@@ -97,10 +97,6 @@ def speech_to_text(audio_data, audio_format="wav", sample_rate=16000):
     }
 
     try:
-        # print(f"发送请求到: {url}")
-        # print(f"请求参数: {json.dumps(payload, indent=2)}")
-        # print(f"音频数据大小: {len(audio_data)} 字节")
-
         # 发送POST请求
         response = requests.post(
             url,

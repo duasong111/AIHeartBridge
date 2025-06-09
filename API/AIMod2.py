@@ -69,8 +69,8 @@ def gen_params(appid, domain, question):
     }
     return data
 
-def get_spark_response(question, appid="3549e948", api_key="65da35f93650aded57ee03e8668752ff",
-                      api_secret="OTg2ZjA1NTJhMzI4ZTVjZmNiMWQwN2I0", spark_url="wss://spark-api.xf-yun.com/v1.1/chat",
+def get_spark_response(question, appid="", api_key="",
+                      api_secret="", spark_url="wss://spark-api.xf-yun.com/v1.1/chat",
                       domain="lite"):
     global answer
     answer = ""

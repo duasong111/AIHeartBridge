@@ -3,7 +3,7 @@ import sys
 
 # API 配置
 API_BASE_URL = "https://api.cloudflare.com/client/v4/accounts/739f8ca9219f7ae877b46759f7fe9eb3/ai/run/"
-headers = {"Authorization": "Bearer UqEuf_Bg-3nEJ3AMxFK6rIUwvVL1pA8Gm26aRhCc"}
+headers = {"Authorization": ""}
 
 # 模型选择
 MODEL = "@cf/meta/llama-3-8b-instruct"

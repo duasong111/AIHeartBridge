@@ -3,7 +3,7 @@ from openai import OpenAI
 import requests  # 添加 requests 异常处理支持
 
 # 初始化 DeepSeek 客户端
-client = OpenAI(api_key="sk-f0a368779df94a55a05371e138f7ce43", base_url="https://api.deepseek.com/v1")
+client = OpenAI(api_key="", base_url="https://api.deepseek.com/v1")
 
 def analyze_messages_with_deepseek(messages, prompt_template=None):
     """

@@ -2,8 +2,8 @@ import requests
 from django.http import HttpResponse
 from rest_framework.views import APIView
 
-API_KEY = "0YZOURxbxIDUsHFvd9vK1TXe"
-SECRET_KEY = "EtmFTdPGzFsEBK9TMXKZvfL55zonRxQv"
+API_KEY = ""
+SECRET_KEY = ""
 
 
 def get_access_token():

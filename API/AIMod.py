@@ -137,9 +137,9 @@ def main(appid, api_key, api_secret, Spark_url, domain, question):
 
 
 # 以下密钥信息从控制台获取
-appid = "3549e948"  # 填写控制台中获取的 APPID 信息
-api_secret = "OTg2ZjA1NTJhMzI4ZTVjZmNiMWQwN2I0"  # 填写控制台中获取的 APISecret 信息
-api_key = "65da35f93650aded57ee03e8668752ff"  # 填写控制台中获取的 APIKey 信息
+appid = ""  # 填写控制台中获取的 APPID 信息
+api_secret = ""  # 填写控制台中获取的 APISecret 信息
+api_key = ""  # 填写控制台中获取的 APIKey 信息
 
 # 用于配置大模型版本，默认“general/generalv2”
 # domain = "general"   # v1.5版本

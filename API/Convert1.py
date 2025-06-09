@@ -7,8 +7,8 @@ import soundfile as sf
 import numpy as np
 
 # 百度API的密钥
-API_KEY = "0YZOURxbxIDUsHFvd9vK1TXe"
-SECRET_KEY = "EtmFTdPGzFsEBK9TMXKZvfL55zonRxQv"
+API_KEY = ""
+SECRET_KEY = ""
 
 
 def get_access_token():
